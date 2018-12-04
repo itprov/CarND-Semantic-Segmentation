@@ -8,7 +8,8 @@ import project_tests as tests
 import sys
 
 # Check TensorFlow Version
-assert LooseVersion(tf.__version__) >= LooseVersion('1.0'), 'Please use TensorFlow version 1.0 or newer.  You are using {}'.format(tf.__version__)
+assert LooseVersion(tf.__version__) >= LooseVersion(
+    '1.0'), 'Please use TensorFlow version 1.0 or newer.  You are using {}'.format(tf.__version__)
 print('TensorFlow Version: {}'.format(tf.__version__))
 
 # Check for a GPU
@@ -16,6 +17,7 @@ if not tf.test.gpu_device_name():
     warnings.warn('No GPU found. Please use a GPU to train your neural network.')
 else:
     print('Default GPU Device: {}'.format(tf.test.gpu_device_name()))
+
 
 def load_vgg(sess, vgg_path):
     """
@@ -41,6 +43,8 @@ def load_vgg(sess, vgg_path):
     vgg_layer7_out = graph.get_tensor_by_name(vgg_layer7_out_tensor_name)
 
     return vgg_input, vgg_keep_prob, vgg_layer3_out, vgg_layer4_out, vgg_layer7_out
+
+
 tests.test_load_vgg(load_vgg, tf)
 
 
@@ -84,6 +88,8 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
         skip2, num_classes, 16, 8, padding='same',
         kernel_regularizer=tf.contrib.layers.l2_regularizer(reg_scale))
     return output
+
+
 tests.test_layers(layers)
 
 
@@ -108,6 +114,8 @@ def optimize(nn_last_layer, correct_label, learning_rate, reg_scale, num_classes
     # Training operation - optimize loss
     train_op = optimizer.minimize(loss)
     return logits, train_op, loss
+
+
 tests.test_optimize(optimize)
 
 
@@ -150,6 +158,8 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
         sys.stdout.write('>')
         sys.stdout.flush()
         print(' {:.3f}'.format(loss))
+
+
 tests.test_train_nn(train_nn)
 
 
@@ -178,10 +188,12 @@ def run():
         # TF placeholders
         correct_label = tf.placeholder(tf.int32, [None, None, None, num_classes])
         learning_rate = tf.placeholder(tf.float32)
-        # Constants
+        # Hyperparameters
         learn_rate = 0.001
-        reg_scale = 0.002
+        reg_scale = 0.01
         keep_pr = 0.5
+        epochs = 30
+        batch_size = 4
 
         # Build NN using load_vgg, layers, and optimize function
         input_image, keep_prob, vgg_layer3_out, vgg_layer4_out, vgg_layer7_out = load_vgg(sess, vgg_path)
@@ -190,9 +202,6 @@ def run():
             fcn_output, correct_label, learning_rate, reg_scale, num_classes)
 
         # Train NN using the train_nn function
-        epochs = 10
-        batch_size = 8
-
         train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_loss, input_image,
                  correct_label, keep_prob, keep_pr, learning_rate, learn_rate)
 
