@@ -167,6 +167,7 @@ def run():
     num_classes = 2
     image_shape = (160, 576)  # KITTI dataset uses 160x576 images
     data_dir = './data'
+    #data_dir = '/data'
     runs_dir = './runs'
     tests.test_for_kitti_dataset(data_dir)
 
@@ -189,8 +190,8 @@ def run():
         correct_label = tf.placeholder(tf.int32, [None, None, None, num_classes])
         learning_rate = tf.placeholder(tf.float32)
         # Hyperparameters
-        learn_rate = 0.001
-        reg_scale = 0.01
+        learn_rate = 1e-3
+        reg_scale = 1e-2
         keep_pr = 0.5
         epochs = 30
         batch_size = 4
